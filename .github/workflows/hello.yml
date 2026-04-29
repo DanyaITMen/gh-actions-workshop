@@ -20,3 +20,9 @@ jobs:
       - name: List after checkout
         run: |
           ls -l
+      - name: Run a multi-line script
+        env:
+          MY_ENV: Hello from Danya
+        run: |
+          echo "Value of MY_ENV: $MY_ENV"
+          echo "Value of GITHUB_ACTOR: $GITHUB_ACTOR"

@@ -1,21 +1,22 @@
 name: Hello World Training Workflow
 
 on: 
-  workflow_dispatch: # Це тригер для ручного запуску
+  workflow_dispatch:
 
 jobs:
   greet-and-list:
     runs-on: ubuntu-latest
     steps:
+      - name: Greet the User
+        run: echo "Hello World!"
+
+      - name: List before checkout
+        run: |
+          ls -l
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Print Hello using Environment Variable
-        env:
-          GREETING: "Hello World! Danya was here."
+      - name: List after checkout
         run: |
-          echo "$GREETING"
-          echo "This workflow was triggered manually."
-
-      - name: List files
-        run: ls -la
+          ls -l

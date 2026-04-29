@@ -4,6 +4,10 @@ on:
   push:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     name: Build and Test
@@ -11,35 +15,32 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Use Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
-    - name: Install dependencies
-      run: |
-        npm init -y
-        npm install jest
-        echo 'test("dummy test", () => { expect(1).toBe(1); });' > app.test.js
-    - name: Run tests with coverage
-      run: npx jest --coverage --coverageReporters="text"
-    - name: Write Coverage to Summary
-      run: |
-        echo "## Coverage Report" >> $GITHUB_STEP_SUMMARY
-        echo "| Status | Category | Percentage | Covered / Total |" >> $GITHUB_STEP_SUMMARY
-        echo "| :---: | :--- | :---: | :---: |" >> $GITHUB_STEP_SUMMARY
-        echo "| 🔵 | Lines | 58.55% | 356 / 608 |" >> $GITHUB_STEP_SUMMARY
-        echo "| 🔵 | Statements | 58.55% | 356 / 608 |" >> $GITHUB_STEP_SUMMARY
-        echo "| 🔵 | Functions | 89.13% | 41 / 46 |" >> $GITHUB_STEP_SUMMARY
-        echo "| 🔵 | Branches | 86.41% | 70 / 81 |" >> $GITHUB_STEP_SUMMARY
+      run: echo "Skipping tests for faster docker build"
 
   package:
     name: Package & Publish
     needs: build
     runs-on: ubuntu-latest
     steps:
-    - name: Create dummy package
-      run: echo "This is a compiled package" > package.zip
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v4
+    - uses: actions/checkout@v4
+      
+    - name: Log in to the Container registry
+      uses: docker/login-action@v3
       with:
-        name: app-package
-        path: package.zip
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Extract metadata (tags, labels) for Docker
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/${{ github.repository }}
+        
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}

@@ -2,6 +2,8 @@ name: Hello World Training Workflow
 
 on: 
   workflow_dispatch:
+  issues:
+    types: [opened]
 
 jobs:
   greet-and-list:
@@ -26,3 +28,4 @@ jobs:
         run: |
           echo "Value of MY_ENV: $MY_ENV"
           echo "Value of GITHUB_ACTOR: $GITHUB_ACTOR"
+          

@@ -6,6 +6,7 @@ on:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -13,10 +14,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20.x'
-    - name: Prepare test environment
+    - name: Install dependencies
       run: |
         npm init -y
         npm install jest
-        echo 'test("dummy test", () => { expect(1).toBe(1); });' > dummy.test.js
-    - name: Run test and generate coverage
-      run: npx jest dummy.test.js --coverage --coverageReporters="text"
+        echo 'test("dummy test", () => { expect(1).toBe(1); });' > app.test.js
+    - name: Run tests with coverage
+      run: npx jest --coverage --coverageReporters="text"
